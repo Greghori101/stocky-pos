@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+CHANGELOG.md export-ignore
+.styleci.yml export-ignore
+/app/Providers/AppServiceProvider.php filter=ignore_part
+/resources/views/auth/view-profile.blade.php filter=ignore_part
+/resources/views/auth/edit-profile.blade.php filter=ignore_part
