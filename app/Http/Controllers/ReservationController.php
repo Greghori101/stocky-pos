@@ -38,37 +38,39 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'started_at'   => 'required|date',
-            'ended_at'     => 'required|date',
+            'started_at'   => 'sometimes|date',
+            'ended_at'     => 'sometimes|date',
             'service_id'   => 'required|exists:services,id',
             'post_id'      => 'required|exists:posts,id',
+            'total_price'      => 'required|numeric',
             'products'     => 'required|array',  // Ensure products is an array
             'products.*.id' => 'required|exists:products,id',  // Ensure each product exists
             'products.*.price' => 'required|numeric', // Product price is required
             'products.*.qte' => 'required|integer|min:1', // Quantity must be at least 1
         ]);
 
-        // Calculate the total price based on products and quantity
-        $totalPrice = 0;
-        foreach ($request->products as $product) {
-            $totalPrice += $product['price'] * $product['qte'];
-        }
-
-        // Calculate the duration in minutes for the service
-        $service = Service::findOrFail($request->service_id);
         $startedAt = Carbon::parse($request->started_at);
         $endedAt = Carbon::parse($request->ended_at);
-        $durationInMinutes = $startedAt->diffInMinutes($endedAt);
-        $servicePrice = $service->price *  $durationInMinutes / $service->unit_per_minute;
 
-        // Calculate the final total price
-        $totalPrice += $servicePrice;
+        // // Calculate the total price based on products and quantity
+        // $totalPrice = 0;
+        // foreach ($request->products as $product) {
+        //     $totalPrice += $product['price'] * $product['qte'];
+        // }
+
+        // // Calculate the duration in minutes for the service
+        // $service = Service::findOrFail($request->service_id);
+        // $durationInMinutes = $startedAt->diffInMinutes($endedAt);
+        // $servicePrice = $service->price *  $durationInMinutes / $service->unit_per_minute;
+
+        // // Calculate the final total price
+        // $totalPrice += $servicePrice;
 
         // Create the reservation
         $reservation = Reservation::create([
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
-            'total_price' => $totalPrice,
+            'total_price' => $request->total_price,
             'service_id' => $request->service_id,
             'post_id' => $request->post_id,
         ]);
@@ -96,6 +98,7 @@ class ReservationController extends Controller
             'ended_at'     => 'sometimes|date',
             'service_id'   => 'sometimes|exists:services,id',
             'post_id'      => 'sometimes|exists:posts,id',
+            'total_price'      => 'sometimes|numeric',
             'products'     => 'sometimes|array',  // Make products optional in update
             'products.*.id' => 'sometimes|exists:products,id',  // Ensure each product exists
             'products.*.price' => 'sometimes|numeric', // Product price is required
@@ -105,24 +108,24 @@ class ReservationController extends Controller
         // Update the reservation details
         $reservation->update($validated);
 
-        // Recalculate the total price based on products and quantity
-        $totalPrice = 0;
-        foreach ($request->products ?? $reservation->products as $product) {
-            $totalPrice += $product['price'] * $product['qte'];
-        }
+        // // Recalculate the total price based on products and quantity
+        // $totalPrice = 0;
+        // foreach ($request->products ?? $reservation->products as $product) {
+        //     $totalPrice += $product['price'] * $product['qte'];
+        // }
 
-        // Calculate the duration in minutes for the service
-        $service = Service::findOrFail($request->service_id ?? $reservation->service_id);
-        $startedAt = Carbon::parse($request->started_at ?? $reservation->started_at);
-        $endedAt = Carbon::parse($request->ended_at ?? $reservation->ended_at);
-        $durationInMinutes = $startedAt->diffInMinutes($endedAt);
-        $servicePrice = $service->unit_per_minute * $durationInMinutes;
+        // // Calculate the duration in minutes for the service
+        // $service = Service::findOrFail($request->service_id ?? $reservation->service_id);
+        // $startedAt = Carbon::parse($request->started_at ?? $reservation->started_at);
+        // $endedAt = Carbon::parse($request->ended_at ?? $reservation->ended_at);
+        // $durationInMinutes = $startedAt->diffInMinutes($endedAt);
+        // $servicePrice = $service->unit_per_minute * $durationInMinutes;
 
-        // Calculate the final total price
-        $totalPrice += $servicePrice;
+        // // Calculate the final total price
+        // $totalPrice += $servicePrice;
 
-        // Update the reservation total price
-        $reservation->update(['total_price' => $totalPrice]);
+        // // Update the reservation total price
+        // $reservation->update(['total_price' => $totalPrice]);
 
         // If products are provided, update the relationship
         if ($request->has('products')) {
