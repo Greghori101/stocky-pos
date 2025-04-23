@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id(); // Primary key
             $table->foreignId('post_id')->constrained()->onDelete('cascade'); // Foreign key to 'posts' table
             $table->foreignId('service_id')->constrained()->onDelete('cascade'); // Foreign key to 'services' table
-            $table->timestamp('started_at'); // Reservation start time
-            $table->timestamp('ended_at'); // Reservation end time
+            $table->timestamp('started_at')->nullable(); // Reservation start time
+            $table->timestamp('ended_at')->nullable(); // Reservation end time
             $table->decimal('total_price', 10, 2); // Total price for the reservation
             $table->timestamps(); // Created at & Updated at timestamps
         });
