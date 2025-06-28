@@ -14,7 +14,7 @@ class ShowWarehouseToTablePosSettings extends Migration
     public function up()
     {
         Schema::table('pos_settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('show_Warehouse')->default(1);
         });
     }

@@ -15,12 +15,11 @@ class CreatePaymentSaleReturnsTable extends Migration {
 	{
 		Schema::create('payment_sale_returns', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('factures_sale_return_user_id');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('factures_sale_return_user_id');
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('sale_return_id')->index('factures_sale_return');
+			$table->unsignedBigInteger('sale_return_id')->index('factures_sale_return');
 			$table->float('montant', 10, 0);
 			$table->string('Reglement', 191);
 			$table->text('notes')->nullable();

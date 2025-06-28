@@ -15,13 +15,12 @@ class CreateQuotationsTable extends Migration {
 	{
 		Schema::create('quotations', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_quotation');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('user_id_quotation');
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('client_id')->index('client_id_quotation');
-			$table->integer('warehouse_id')->index('warehouse_id_quotation');
+			$table->unsignedBigInteger('client_id')->index('client_id_quotation');
+			$table->unsignedBigInteger('warehouse_id')->index('warehouse_id_quotation');
 			$table->float('tax_rate', 10, 0)->nullable()->default(0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);
 			$table->float('discount', 10, 0)->nullable()->default(0);

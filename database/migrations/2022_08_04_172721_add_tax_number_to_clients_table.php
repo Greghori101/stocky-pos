@@ -14,7 +14,7 @@ class AddTaxNumberToClientsTable extends Migration
     public function up()
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->string('tax_number', 192)->after('phone')->nullable();
         });
     }

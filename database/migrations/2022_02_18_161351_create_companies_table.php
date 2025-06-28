@@ -15,8 +15,7 @@ class CreateCompaniesTable extends Migration {
 	{
 		Schema::create('companies', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('name', 191);
 			$table->string('email', 191)->nullable();
 			$table->string('phone', 191)->nullable();

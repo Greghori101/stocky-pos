@@ -15,15 +15,14 @@ class CreateDraftSaleDetailsTable extends Migration {
 	{
 		Schema::create('draft_sale_details', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->date('date');
-			$table->integer('draft_sale_id')->index('draft_sale_details_draft_sale_id');
-			$table->integer('product_id')->index('draft_sale_details_product_id');
-			$table->integer('product_variant_id')->nullable()->index('draft_sale_details_product_variant_id');
+			$table->unsignedBigInteger('draft_sale_id')->index('draft_sale_details_draft_sale_id');
+			$table->unsignedBigInteger('product_id')->index('draft_sale_details_product_id');
+			$table->unsignedBigInteger('product_variant_id')->nullable()->index('draft_sale_details_product_variant_id');
 			$table->text('imei_number')->nullable();
 			$table->float('price', 10, 0);
-			$table->integer('sale_unit_id')->nullable()->index('draft_sale_details_sale_unit_id');
+			$table->unsignedBigInteger('sale_unit_id')->nullable()->index('draft_sale_details_sale_unit_id');
 			$table->float('TaxNet', 10, 0)->nullable();
 			$table->string('tax_method', 192)->nullable()->default('1');
 			$table->float('discount', 10, 0)->nullable();

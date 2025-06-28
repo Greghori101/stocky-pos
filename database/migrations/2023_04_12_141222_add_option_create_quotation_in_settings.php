@@ -14,7 +14,7 @@ class AddOptionCreateQuotationInSettings extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('quotation_with_stock')->after('sms_gateway')->default(1);
         });
     }

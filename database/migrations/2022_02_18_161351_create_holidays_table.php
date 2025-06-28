@@ -15,10 +15,9 @@ class CreateHolidaysTable extends Migration {
 	{
 		Schema::create('holidays', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('title', 192);
-			$table->integer('company_id')->index('holidays_company_id');
+			$table->unsignedBigInteger('company_id')->index('holidays_company_id');
 			$table->date('start_date');
 			$table->date('end_date');
 			$table->text('description')->nullable();

@@ -130,7 +130,7 @@ class ProductPolicy
      * @param  \App\Models\Product  $product
      * @return mixed
      */
-    public function restore(User $user, Article $product)
+    public function restore(User $user, Product $product)
     {
         //
     }
@@ -142,7 +142,7 @@ class ProductPolicy
      * @param  \App\Models\Product  $product
      * @return mixed
      */
-    public function forceDelete(User $user, Article $product)
+    public function forceDelete(User $user, Product $product)
     {
         //
     }

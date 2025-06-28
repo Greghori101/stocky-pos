@@ -15,18 +15,17 @@ class CreateProductsTable extends Migration {
 	{
 		Schema::create('products', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('code', 192);
 			$table->string('Type_barcode', 192);
 			$table->string('name', 192);
 			$table->float('cost', 10, 0);
 			$table->float('price', 10, 0);
-			$table->integer('category_id')->index('category_id');
-			$table->integer('brand_id')->nullable()->index('brand_id_products');
-			$table->integer('unit_id')->nullable()->index('unit_id_products');
-			$table->integer('unit_sale_id')->nullable()->index('unit_id_sales');
-			$table->integer('unit_purchase_id')->nullable()->index('unit_purchase_products');
+			$table->unsignedBigInteger('category_id')->index('category_id');
+			$table->unsignedBigInteger('brand_id')->nullable()->index('brand_id_products');
+			$table->unsignedBigInteger('unit_id')->nullable()->index('unit_id_products');
+			$table->unsignedBigInteger('unit_sale_id')->nullable()->index('unit_id_sales');
+			$table->unsignedBigInteger('unit_purchase_id')->nullable()->index('unit_purchase_products');
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);
 			$table->string('tax_method', 192)->nullable()->default('1');
 			$table->text('image')->nullable();

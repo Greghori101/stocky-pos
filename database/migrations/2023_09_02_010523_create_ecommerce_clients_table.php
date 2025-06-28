@@ -15,8 +15,8 @@ class CreateEcommerceClientsTable extends Migration {
 	{
 		Schema::create('ecommerce_clients', function(Blueprint $table)
 		{
-			$table->integer('id', true);
-			$table->integer('client_id')->index('ecommerce_clients_client_id');
+			$table->id();
+			$table->unsignedBigInteger('client_id')->index('ecommerce_clients_client_id');
 			$table->string('username', 192);
 			$table->string('email', 192);
 			$table->dateTime('email_verified_at')->nullable();

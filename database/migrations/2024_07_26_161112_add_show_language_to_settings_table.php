@@ -14,7 +14,7 @@ class AddShowLanguageToSettingsTable extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('show_language')->after('sms_gateway')->default(1);
         });
     }

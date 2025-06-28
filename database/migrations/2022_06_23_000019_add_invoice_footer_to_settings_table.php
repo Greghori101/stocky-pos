@@ -14,7 +14,7 @@ class AddInvoiceFooterToSettingsTable extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('is_invoice_footer')->after('logo')->default(0);
             $table->string('invoice_footer', 192)->after('is_invoice_footer')->nullable();
         });

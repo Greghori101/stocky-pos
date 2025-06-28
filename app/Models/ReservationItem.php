@@ -14,6 +14,13 @@ class ReservationItem extends Model
         'product_id',
         'price',
         'qte',
+        'unit_id',
+        'total',
+        'price',
+        'tax_net',
+        'tax_method',
+        'discount',
+        'discount_method',
     ];
 
     public function reservation()

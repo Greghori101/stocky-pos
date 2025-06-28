@@ -14,7 +14,7 @@ class AddProductsPerPageToPosSettingsTable extends Migration
     public function up()
     {
         Schema::table('pos_settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->integer('products_per_page')->after('show_address')->default(8);
 
         });

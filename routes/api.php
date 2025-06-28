@@ -550,6 +550,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
         Route::get('{service}', 'ServiceController@show'); // Get a specific service by ID
         Route::put('{service}', 'ServiceController@update'); // Update a service
         Route::delete('{service}', 'ServiceController@destroy'); // Delete a service
+        Route::post("delete/by_selection", "ServiceController@delete_by_selection");
     });
 
     //------------------------------- Posts ------------------------\\

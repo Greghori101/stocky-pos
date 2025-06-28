@@ -14,7 +14,7 @@ class MakeEmailProvidersNullable extends Migration
     public function up()
     {
         Schema::table('providers', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->string('email')->nullable()->change();
         });
     }

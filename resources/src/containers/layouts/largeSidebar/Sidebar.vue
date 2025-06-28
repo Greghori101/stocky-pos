@@ -402,6 +402,24 @@
               <span class="item-name">{{$t('Units')}}</span>
             </router-link>
           </li>
+          <li
+            class="nav-item"
+            v-if="currentUserPermissions && currentUserPermissions.includes('posts_view')"
+          >
+            <router-link tag="a" class to="/app/products/Posts">
+              <i class="nav-icon i-Duplicate-Layer"></i>
+              <span class="item-name">{{$t('Posts')}}</span>
+            </router-link>
+          </li>
+          <li
+            class="nav-item"
+            v-if="currentUserPermissions && currentUserPermissions.includes('services_view')"
+          >
+            <router-link tag="a" class to="/app/products/Services">
+              <i class="nav-icon i-Duplicate-Layer"></i>
+              <span class="item-name">{{$t('Services')}}</span>
+            </router-link>
+          </li>
         </ul>
 
         <ul
@@ -629,6 +647,15 @@
             <router-link tag="a" class to="/app/pos">
               <i class="nav-icon i-Files"></i>
               <span class="item-name">POS</span>
+            </router-link>
+          </li>
+          <li
+            class="nav-item"
+            v-if="currentUserPermissions && currentUserPermissions.includes('reservations_view')"
+          >
+            <router-link tag="a" class to="/app/reservations">
+              <i class="nav-icon i-Files"></i>
+              <span class="item-name">Reservations</span>
             </router-link>
           </li>
           <li
@@ -1190,6 +1217,8 @@ export default {
     window.addEventListener("resize", this.handleWindowResize);
     document.addEventListener("click", this.returnSelectedParentMenu);
     this.handleWindowResize();
+    console.log(this.currentUserPermissions);
+    
   },
 
   beforeDestroy() {

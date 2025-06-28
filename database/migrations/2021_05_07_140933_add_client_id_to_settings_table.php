@@ -15,8 +15,8 @@ class AddClientIdToSettingsTable extends Migration
     {
         if (! Schema::hasColumn('settings', 'client_id')) {
             Schema::table('settings', function (Blueprint $table) {
-                $table->engine = 'InnoDB';
-                $table->integer('client_id')->after('developed_by')->nullable()->index('client_id');
+                
+                $table->unsignedBigInteger('client_id')->after('developed_by')->nullable()->index('client_id');
             });
         }
     }

@@ -15,8 +15,7 @@ class CreateAccountsTable extends Migration {
 	{
 		Schema::create('accounts', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('account_num', 192);
 			$table->string('account_name', 192);
 			$table->float('initial_balance', 10, 0);

@@ -15,8 +15,7 @@ class CreateSmsGatewayTable extends Migration {
 	{
 		Schema::create('sms_gateway', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('title', 192);
 			$table->timestamps(6);
 			$table->softDeletes();

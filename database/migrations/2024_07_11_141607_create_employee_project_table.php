@@ -15,9 +15,9 @@ class CreateEmployeeProjectTable extends Migration {
 	{
 		Schema::create('employee_project', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('employee_id')->index('employee_project_employee_id');
-			$table->integer('project_id')->index('employee_project_project_id');
+			
+			$table->unsignedBigInteger('employee_id')->index('employee_project_employee_id');
+			$table->unsignedBigInteger('project_id')->index('employee_project_project_id');
 		});
 	}
 

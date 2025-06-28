@@ -15,9 +15,9 @@ class CreateEmployeeTaskTable extends Migration {
 	{
 		Schema::create('employee_task', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('employee_id')->index('employee_task_employee_id');
-			$table->integer('task_id')->index('employee_task_task_id');
+			
+			$table->unsignedBigInteger('employee_id')->index('employee_task_employee_id');
+			$table->unsignedBigInteger('task_id')->index('employee_task_task_id');
 		});
 	}
 

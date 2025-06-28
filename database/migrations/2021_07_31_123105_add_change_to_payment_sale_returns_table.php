@@ -14,7 +14,7 @@ class AddChangeToPaymentSaleReturnsTable extends Migration
     public function up()
     {
         Schema::table('payment_sale_returns', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->float('change', 10, 0)->after('montant')->default(0);
         });
     }

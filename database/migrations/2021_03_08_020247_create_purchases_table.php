@@ -15,13 +15,12 @@ class CreatePurchasesTable extends Migration {
 	{
 		Schema::create('purchases', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_purchases');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('user_id_purchases');
 			$table->string('Ref', 192);
 			$table->date('date');
-			$table->integer('provider_id')->index('provider_id');
-			$table->integer('warehouse_id')->index('warehouse_id_purchase');
+			$table->unsignedBigInteger('provider_id')->index('provider_id');
+			$table->unsignedBigInteger('warehouse_id')->index('warehouse_id_purchase');
 			$table->float('tax_rate', 10, 0)->nullable()->default(0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);
 			$table->float('discount', 10, 0)->nullable()->default(0);

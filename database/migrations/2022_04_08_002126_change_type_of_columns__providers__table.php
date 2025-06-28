@@ -14,7 +14,7 @@ class ChangeTypeOfColumnsProvidersTable extends Migration
     public function up()
     {
         Schema::table('providers', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->string('country')->nullable()->change();
             $table->string('city')->nullable()->change();
             $table->string('phone')->nullable()->change();

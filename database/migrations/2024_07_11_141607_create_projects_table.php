@@ -15,14 +15,13 @@ class CreateProjectsTable extends Migration {
 	{
 		Schema::create('projects', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('title');
-			$table->integer('client_id')->index('projects_client_id');
+			$table->unsignedBigInteger('client_id')->index('projects_client_id');
 			$table->date('start_date');
 			$table->date('end_date');
 			$table->text('description')->nullable();
-			$table->integer('company_id')->index('projects_company_id');
+			$table->unsignedBigInteger('company_id')->index('projects_company_id');
 			$table->string('status');
 			$table->timestamps(6);
 			$table->softDeletes();

@@ -14,7 +14,7 @@ class AddColumnManageStock extends Migration
     public function up()
     {
         Schema::table('product_warehouse', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('manage_stock')->after('qte')->default(1);
         });
     }

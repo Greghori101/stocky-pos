@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id(); // Primary key
             $table->decimal('price', 10, 2); // Price column (for the service)
             $table->unsignedBigInteger('unit_per_minute')->default(1); // Price per minute for the service
+            $table->timestamp('deleted_at')->nullable(); // Created at & Updated at timestamps
             $table->timestamps(); // Created at & Updated at timestamps
+			$table->text('image')->nullable();
         });
     }
 

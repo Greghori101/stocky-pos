@@ -15,8 +15,7 @@ class CreateQuotationDetailsTable extends Migration {
 	{
 		Schema::create('quotation_details', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->float('price', 10, 0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);
 			$table->string('tax_method', 192)->nullable()->default('1');
@@ -24,9 +23,9 @@ class CreateQuotationDetailsTable extends Migration {
 			$table->string('discount_method', 192)->nullable()->default('1');
 			$table->float('total', 10, 0);
 			$table->float('quantity', 10, 0);
-			$table->integer('product_id')->index('product_id_quotation_details');
-			$table->integer('product_variant_id')->nullable()->index('quote_product_variant_id');
-			$table->integer('quotation_id')->index('quotation_id');
+			$table->unsignedBigInteger('product_id')->index('product_id_quotation_details');
+			$table->unsignedBigInteger('product_variant_id')->nullable()->index('quote_product_variant_id');
+			$table->unsignedBigInteger('quotation_id')->index('quotation_id');
 			$table->timestamps(6);
 		});
 	}

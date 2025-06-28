@@ -15,7 +15,7 @@ class AddFooterToSettingsTable extends Migration
     {
         if (! Schema::hasColumn('settings', 'footer')) {
             Schema::table('settings', function (Blueprint $table) {
-                $table->engine = 'InnoDB';
+                
                 $table->string('footer', 192)->after('logo')->default('Stocky - Ultimate Inventory With POS');
     
             });

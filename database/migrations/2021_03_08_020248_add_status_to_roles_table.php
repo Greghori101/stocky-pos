@@ -15,7 +15,7 @@ class AddStatusToRolesTable extends Migration
     {
         if (! Schema::hasColumn('roles', 'status')) {
             Schema::table('roles', function (Blueprint $table) {
-                $table->engine = 'InnoDB';
+                
                 $table->integer('status')->default(0);
             });
         }

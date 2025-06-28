@@ -14,8 +14,8 @@ class CreateAccountIdToExpenses extends Migration
     public function up()
     {
         Schema::table('expenses', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->integer('account_id')->nullable()->after('warehouse_id');
+            
+            $table->unsignedBigInteger('account_id')->nullable()->after('warehouse_id');
             $table->foreign('account_id', 'expense_account_id')->references('id')->on('accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 
         });

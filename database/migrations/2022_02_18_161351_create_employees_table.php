@@ -15,8 +15,7 @@ class CreateEmployeesTable extends Migration {
 	{
 		Schema::create('employees', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('firstname', 192);
 			$table->string('lastname', 192);
 			$table->string('username', 191);
@@ -33,10 +32,10 @@ class CreateEmployeesTable extends Migration {
 			$table->string('document', 192)->nullable();
 			$table->date('birth_date')->nullable();
 			$table->date('joining_date')->nullable();
-			$table->integer('company_id')->index('employees_company_id');
-			$table->integer('department_id')->index('employees_department_id');
-			$table->integer('designation_id')->index('employees_designation_id');
-			$table->integer('office_shift_id')->index('employees_office_shift_id');
+			$table->unsignedBigInteger('company_id')->index('employees_company_id');
+			$table->unsignedBigInteger('department_id')->index('employees_department_id');
+			$table->unsignedBigInteger('designation_id')->index('employees_designation_id');
+			$table->unsignedBigInteger('office_shift_id')->index('employees_office_shift_id');
 			$table->boolean('remaining_leave')->nullable()->default(0);
 			$table->boolean('total_leave')->nullable()->default(0);
 			$table->decimal('hourly_rate', 10)->nullable()->default(0.00);

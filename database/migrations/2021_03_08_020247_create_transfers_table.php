@@ -15,13 +15,12 @@ class CreateTransfersTable extends Migration {
 	{
 		Schema::create('transfers', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_transfers');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('user_id_transfers');
 			$table->string('Ref', 192);
 			$table->date('date');
-			$table->integer('from_warehouse_id')->index('from_warehouse_id');
-			$table->integer('to_warehouse_id')->index('to_warehouse_id');
+			$table->unsignedBigInteger('from_warehouse_id')->index('from_warehouse_id');
+			$table->unsignedBigInteger('to_warehouse_id')->index('to_warehouse_id');
 			$table->float('items', 10, 0);
 			$table->float('tax_rate', 10, 0)->nullable()->default(0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);

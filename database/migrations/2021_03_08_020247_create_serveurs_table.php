@@ -15,8 +15,7 @@ class CreateServeursTable extends Migration {
 	{
 		Schema::create('servers', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('host', 191);
 			$table->integer('port');
 			$table->string('username', 191);

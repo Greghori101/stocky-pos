@@ -15,11 +15,10 @@ class CreateAdjustmentDetailsTable extends Migration {
 	{
 		Schema::create('adjustment_details', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('product_id')->index('adjust_product_id');
-			$table->integer('adjustment_id')->index('adjust_adjustment_id');
-			$table->integer('product_variant_id')->nullable()->index('adjust_product_variant');
+			$table->id();
+			$table->unsignedBigInteger('product_id')->index('adjust_product_id');
+			$table->unsignedBigInteger('adjustment_id')->index('adjust_adjustment_id');
+			$table->unsignedBigInteger('product_variant_id')->nullable()->index('adjust_product_variant');
 			$table->float('quantity', 10, 0);
 			$table->string('type', 192);
 			$table->timestamps(6);

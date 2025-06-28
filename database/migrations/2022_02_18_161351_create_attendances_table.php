@@ -15,11 +15,10 @@ class CreateAttendancesTable extends Migration {
 	{
 		Schema::create('attendances', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('attendances_user_id');
-			$table->integer('company_id')->index('attendances_company_id');
-			$table->integer('employee_id')->index('attendances_employee_id');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('attendances_user_id');
+			$table->unsignedBigInteger('company_id')->index('attendances_company_id');
+			$table->unsignedBigInteger('employee_id')->index('attendances_employee_id');
 			$table->date('date');
 			$table->string('clock_in', 191);
 			$table->string('clock_in_ip', 45);

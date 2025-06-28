@@ -15,8 +15,7 @@ class CreateUsersTable extends Migration {
 	{
 		Schema::create('users', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('firstname');
 			$table->string('lastname');
 			$table->string('username', 192);
@@ -24,7 +23,7 @@ class CreateUsersTable extends Migration {
 			$table->string('password');
 			$table->string('avatar')->nullable();
 			$table->string('phone', 192);
-			$table->integer('role_id');
+			$table->unsignedBigInteger('role_id');
 			$table->boolean('statut')->default(1);
 			$table->timestamps(6);
 			$table->softDeletes();

@@ -15,7 +15,7 @@ class AddSmsGatewayToSettings extends Migration
         {
             if (! Schema::hasColumn('settings', 'sms_gateway_id')) {
                 Schema::table('settings', function (Blueprint $table) {
-                    $table->engine = 'InnoDB';
+                    
                     $table->integer('sms_gateway')->after('default_language')->nullable()->default(1);
                 });
             }

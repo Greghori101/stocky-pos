@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
@@ -10,6 +10,8 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeForUser($request->user('api'), 'view', Post::class);
+
         $query = Post::with('reservations');
 
 
@@ -31,6 +33,7 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeForUser($request->user('api'), 'create', Post::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
@@ -40,13 +43,15 @@ class PostController extends Controller
         return response()->json($post, 201);
     }
 
-    public function show(Post $post)
+    public function show(Request $request,Post $post)
     {
+        $this->authorizeForUser($request->user('api'), 'view', Post::class);
         return response()->json($post->load('reservations'));
     }
 
     public function update(Request $request, Post $post)
     {
+        $this->authorizeForUser($request->user('api'), 'update', Post::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
@@ -56,8 +61,9 @@ class PostController extends Controller
         return response()->json($post);
     }
 
-    public function destroy(Post $post)
+    public function destroy(Request $request,Post $post)
     {
+        $this->authorizeForUser($request->user('api'), 'delete', Post::class);
         $post->delete();
 
         return response()->json(null, 204);

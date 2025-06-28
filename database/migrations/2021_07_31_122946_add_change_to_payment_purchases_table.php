@@ -14,7 +14,7 @@ class AddChangeToPaymentPurchasesTable extends Migration
     public function up()
     {
         Schema::table('payment_purchases', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->float('change', 10, 0)->after('montant')->default(0);
         });
     }

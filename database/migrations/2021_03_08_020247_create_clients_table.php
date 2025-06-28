@@ -15,8 +15,7 @@ class CreateClientsTable extends Migration {
 	{
 		Schema::create('clients', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('name');
 			$table->integer('code');
 			$table->string('email', 192);

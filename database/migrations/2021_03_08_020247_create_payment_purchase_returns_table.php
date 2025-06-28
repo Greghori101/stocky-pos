@@ -15,12 +15,11 @@ class CreatePaymentPurchaseReturnsTable extends Migration {
 	{
 		Schema::create('payment_purchase_returns', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_payment_return_purchase');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('user_id_payment_return_purchase');
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('purchase_return_id')->index('supplier_id_payment_return_purchase');
+			$table->unsignedBigInteger('purchase_return_id')->index('supplier_id_payment_return_purchase');
 			$table->float('montant', 10, 0);
 			$table->string('Reglement', 191);
 			$table->text('notes')->nullable();

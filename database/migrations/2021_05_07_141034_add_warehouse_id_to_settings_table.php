@@ -15,8 +15,8 @@ class AddWarehouseIdToSettingsTable extends Migration
     {
         if (! Schema::hasColumn('settings', 'warehouse_id')) {
             Schema::table('settings', function (Blueprint $table) {
-                $table->engine = 'InnoDB';
-                $table->integer('warehouse_id')->after('client_id')->nullable()->index('warehouse_id');
+                
+                $table->unsignedBigInteger('warehouse_id')->after('client_id')->nullable()->index('warehouse_id');
             });
         }
     }

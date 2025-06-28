@@ -15,12 +15,11 @@ class CreatePaymentPurchasesTable extends Migration {
 	{
 		Schema::create('payment_purchases', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
-			$table->integer('user_id')->index('user_id_payment_purchases');
+			$table->id();
+			$table->unsignedBigInteger('user_id')->index('user_id_payment_purchases');
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('purchase_id')->index('payments_purchase_id');
+			$table->unsignedBigInteger('purchase_id')->index('payments_purchase_id');
 			$table->float('montant', 10, 0);
 			$table->string('Reglement', 192);
 			$table->text('notes')->nullable();

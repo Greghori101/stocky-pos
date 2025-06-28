@@ -15,13 +15,12 @@ class CreateExpensesTable extends Migration {
 	{
 		Schema::create('expenses', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->date('date');
 			$table->string('Ref', 192);
-			$table->integer('user_id')->index('expense_user_id');
-			$table->integer('expense_category_id')->index('expense_category_id');
-			$table->integer('warehouse_id')->index('expense_warehouse_id');
+			$table->unsignedBigInteger('user_id')->index('expense_user_id');
+			$table->unsignedBigInteger('expense_category_id')->index('expense_category_id');
+			$table->unsignedBigInteger('warehouse_id')->index('expense_warehouse_id');
 			$table->string('details', 192);
 			$table->float('amount', 10, 0);
 			$table->timestamps(6);

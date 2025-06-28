@@ -14,7 +14,7 @@ class AddIsPrintableToposSettingsTable extends Migration
     public function up()
     {
         Schema::table('pos_settings', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->boolean('is_printable')->after('show_address')->default(1);
 
         });

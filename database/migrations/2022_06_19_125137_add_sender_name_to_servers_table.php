@@ -14,7 +14,7 @@ class AddSenderNameToServersTable extends Migration
     public function up()
     {
         Schema::table('servers', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
+            
             $table->string('sender_name', 191)->after('port')->default('Admin');
             $table->string('mail_mailer', 191)->after('id')->default('smtp');
         });

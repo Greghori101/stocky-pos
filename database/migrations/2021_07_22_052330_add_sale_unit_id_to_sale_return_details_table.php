@@ -14,8 +14,8 @@ class AddSaleUnitIdToSaleReturnDetailsTable extends Migration
     public function up()
     {
         Schema::table('sale_return_details', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->integer('sale_unit_id')->nullable()->after('price');
+            
+            $table->unsignedBigInteger('sale_unit_id')->nullable()->after('price');
             $table->foreign('sale_unit_id', 'sale_unit_id_return_details')->references('id')->on('units')->onUpdate('RESTRICT')->onDelete('RESTRICT');
         });
     }

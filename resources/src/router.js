@@ -100,6 +100,26 @@ const baseRoutes = [
                             )
                     },
 
+                     // posts
+                     {
+                        name: "posts",
+                        path: "Posts",
+                        component: () =>
+                            import(
+                                /* webpackChunkName: "Posts" */ "./views/app/pages/products/posts"
+                            )
+                    },
+
+                     // services
+                     {
+                        name: "services",
+                        path: "Services",
+                        component: () =>
+                            import(
+                                /* webpackChunkName: "Services" */ "./views/app/pages/products/services"
+                            )
+                    },
+
                     // brands
                     {
                         name: "brands",
@@ -1314,6 +1334,7 @@ const baseRoutes = [
         component: () =>
             import(/* webpackChunkName: "pos" */ "./views/app/pages/pos")
     },
+    
 
     {
         name: "pos_draft",
@@ -1321,6 +1342,22 @@ const baseRoutes = [
         component: () =>
             import(
                 /* webpackChunkName: "pos_draft" */ "./views/app/pages/pos_draft"
+            )
+    },
+    {
+        name: "reservations",
+        path: "/app/reservations",
+        component: () =>
+            import(
+                /* webpackChunkName: "reservations" */ "./views/app/pages/reservations"
+            )
+    },
+    {
+        name: "reservation_draft",
+        path: "/app/reservations/create/:id",
+        component: () =>
+            import(
+                /* webpackChunkName: "reservation_draft" */ "./views/app/pages/reservation_draft"
             )
     },
 

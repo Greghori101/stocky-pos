@@ -15,11 +15,10 @@ class CreateDepartmentsTable extends Migration {
 	{
 		Schema::create('departments', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('department', 191);
-			$table->integer('company_id')->index('department_company_id');
-			$table->integer('department_head')->nullable()->index('department_department_head');
+			$table->unsignedBigInteger('company_id')->index('department_company_id');
+			$table->unsignedBigInteger('department_head')->nullable()->index('department_department_head');
 			$table->timestamps(6);
 			$table->softDeletes();
 		});

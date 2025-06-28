@@ -15,11 +15,10 @@ class CreateTasksTable extends Migration {
 	{
 		Schema::create('tasks', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('title', 192);
-			$table->integer('project_id')->index('Tasks_project_id');
-			$table->integer('company_id')->index('Tasks_company_id');
+			$table->unsignedBigInteger('project_id')->index('Tasks_project_id');
+			$table->unsignedBigInteger('company_id')->index('Tasks_company_id');
 			$table->date('start_date');
 			$table->date('end_date');
 			$table->string('estimated_hour', 192)->nullable();

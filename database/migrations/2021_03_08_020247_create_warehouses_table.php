@@ -15,8 +15,7 @@ class CreateWarehousesTable extends Migration {
 	{
 		Schema::create('warehouses', function(Blueprint $table)
 		{
-			$table->engine = 'InnoDB';
-			$table->integer('id', true);
+			$table->id();
 			$table->string('name', 192);
 			$table->string('city', 192)->nullable();
 			$table->string('mobile', 192)->nullable();

@@ -14,8 +14,8 @@ class AddPurchaseIdToPurchaseReturnTable extends Migration
     public function up()
     {
         Schema::table('purchase_returns', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->integer('purchase_id')->nullable()->after('Ref');
+            
+            $table->unsignedBigInteger('purchase_id')->nullable()->after('Ref');
             $table->foreign('purchase_id', 'purchase_id_purchase_returns')->references('id')->on('purchases')->onUpdate('RESTRICT')->onDelete('RESTRICT');
         });
     }

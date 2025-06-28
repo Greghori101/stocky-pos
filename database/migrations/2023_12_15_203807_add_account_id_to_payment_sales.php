@@ -14,8 +14,8 @@ class AddAccountIdToPaymentSales extends Migration
     public function up()
     {
         Schema::table('payment_sales', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->integer('account_id')->nullable()->after('sale_id');
+            
+            $table->unsignedBigInteger('account_id')->nullable()->after('sale_id');
             $table->foreign('account_id', 'payment_sales_account_id')->references('id')->on('accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 
         });
