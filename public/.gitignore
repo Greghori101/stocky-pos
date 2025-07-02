@@ -36,4 +36,4 @@ Thumbs.db
 .komodotools
 *.komodoproject
 
-/js
+/public/js
