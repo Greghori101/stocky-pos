@@ -540,6 +540,13 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
         Route::get('{reservation}', 'ReservationController@show'); // Get a specific reservation by ID
         Route::put('{reservation}', 'ReservationController@update'); // Update a reservation
         Route::delete('{reservation}', 'ReservationController@destroy'); // Delete a reservation
+        
+        // Room reservation specific routes
+        Route::get('posts/all', 'ReservationController@get_posts'); // Get all posts (rooms)
+        Route::get('services/all', 'ReservationController@get_services'); // Get all services
+        Route::post('check-availability', 'ReservationController@check_post_availability'); // Check room availability
+        Route::post('create-room', 'ReservationController@create_room_reservation'); // Create room reservation
+        Route::post('create-draft-room', 'ReservationController@create_draft_room_reservation'); // Create draft room reservation
     });
 
     //------------------------------- Services ------------------------\\

@@ -258,6 +258,31 @@
                       </validation-provider>
                     </b-col>
 
+                    <!-- Select Room (Post) -->
+                    <b-col lg="12" md="12" sm="12">
+                      <b-form-group label="Select Room (Post)">
+                        <v-select
+                          v-model="sale.post_id"
+                          :options="posts.map(post => ({label: post.name, value: post.id}))"
+                          :reduce="label => label.value"
+                          placeholder="Select a room"
+                          :clearable="true"
+                        />
+                      </b-form-group>
+                    </b-col>
+                    <!-- Select Service -->
+                    <b-col lg="12" md="12" sm="12">
+                      <b-form-group label="Select Service">
+                        <v-select
+                          v-model="sale.service_id"
+                          :options="services.map(service => ({label: service.name || ('Service #' + service.id), value: service.id}))"
+                          :reduce="label => label.value"
+                          placeholder="Select a service"
+                          :clearable="true"
+                        />
+                      </b-form-group>
+                    </b-col>
+
                     <!-- Details Product  -->
                     <b-col md="12" class="mt-2">
                       <div class="pos-detail">
@@ -1254,8 +1279,6 @@
                       </b-form-group>
                     </b-col>
 
-
-
                 <b-col md="12" class="mt-3">
                   <b-button
                     variant="primary"
@@ -1473,7 +1496,7 @@ export default {
     FlagIcon
   },
   metaInfo: {
-    title: "POS"
+    title: "Reservations"
   },
   data() {
     return {
@@ -1601,6 +1624,8 @@ export default {
         discount: 0,
         TaxNet: 0,
         notes:'',
+        post_id: "",
+        service_id: "",
       },
       client: {
         id: "",
@@ -1644,7 +1669,9 @@ export default {
         imei_number:"",
       },
       sound: "/audio/Beep.wav",
-      audio: new Audio("/audio/Beep.wav")
+      audio: new Audio("/audio/Beep.wav"),
+      posts: [],
+      services: [],
     };
   },
   computed: {
@@ -1753,6 +1780,8 @@ export default {
   mounted() {
     this.changeSidebarProperties();
     this.paginate_products(this.product_perPage, 0);
+    this.fetchPosts();
+    this.fetchServices();
   },
   methods: {
     ...mapActions(["changeSidebarProperties", "changeThemeMode", "logout"]),
@@ -2014,6 +2043,8 @@ export default {
           notes: this.sale.notes,
           details: this.details,
           GrandTotal: this.GrandTotal,
+          post_id: this.sale.post_id,
+          service_id: this.sale.service_id,
         })
         .then(response => {
           if (response.data.success === true) {
@@ -2214,7 +2245,9 @@ export default {
           tax_number: this.client.tax_number,
           country: this.client.country,
           city: this.client.city,
-          adresse: this.client.adresse
+          adresse: this.client.adresse,
+          post_id: this.sale.post_id,
+          service_id: this.sale.service_id,
         })
         .then(response => {
           NProgress.done();
@@ -2553,6 +2586,8 @@ export default {
             is_new_credit_card: this.is_new_credit_card,
             selectedCard: this.selectedCard,
             card_id: this.card_id,
+            post_id: this.sale.post_id,
+            service_id: this.sale.service_id,
           })
           .then(response => {
             this.paymentProcessing = false;
@@ -2608,6 +2643,8 @@ export default {
             is_new_credit_card: this.is_new_credit_card,
             selectedCard: this.selectedCard,
             card_id: this.card_id,
+            post_id: this.sale.post_id,
+            service_id: this.sale.service_id,
           })
           .then(response => {
             if (response.data.success === true) {
@@ -3065,7 +3102,13 @@ export default {
         .catch(response => {
           this.isLoading = false;
         });
-    }
+    },
+    fetchPosts() {
+      axios.get('posts').then(res => { this.posts = res.data.data || res.data; });
+    },
+    fetchServices() {
+      axios.get('services').then(res => { this.services = res.data.data || res.data; });
+    },
   },
   //-------------------- Created Function -----\\
   created() {

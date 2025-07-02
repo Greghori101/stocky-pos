@@ -43,6 +43,8 @@ use App\Models\PaymentWithCreditCard;
 use DB;
 use PDF;
 use ArPHP\I18N\Arabic;
+use App\Models\Post;
+use App\Models\Service;
 
 class ReservationsController extends BaseController
 {
@@ -185,12 +187,13 @@ class ReservationsController extends BaseController
 
     public function store(Request $request)
     {
-
         $this->authorizeForUser($request->user('api'), 'create', Reservation::class);
 
         request()->validate([
             'client_id' => 'required',
             'warehouse_id' => 'required',
+            'post_id' => 'required|exists:posts,id',
+            'service_id' => 'required|exists:services,id',
         ]);
 
         \DB::transaction(function () use ($request) {
@@ -211,7 +214,8 @@ class ReservationsController extends BaseController
             $order->payment_status = 'unpaid';
             $order->notes = $request->notes;
             $order->user_id = Auth::user()->id;
-
+            $order->post_id = $request->post_id;
+            $order->service_id = $request->service_id;
             $order->save();
 
             $data = $request['details'];
@@ -2014,6 +2018,197 @@ class ReservationsController extends BaseController
         return response()->json($data);
 
 
+    }
+
+    //------------- GET ALL POSTS (ROOMS) -----------\\
+    public function get_posts(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', Post::class);
+
+        $query = Post::with('reservations');
+
+        if ($search = $request->query('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $orderBy = $request->query('order_by', 'created_at');
+        $direction = $request->query('order_direction', 'desc');
+        $query->orderBy($orderBy, $direction);
+
+        $perPage = $request->query('per_page', 10);
+        $posts = $query->paginate($perPage);
+
+        return response()->json($posts);
+    }
+
+    //------------- GET ALL SERVICES -----------\\
+    public function get_services(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', Service::class);
+        
+        $query = Service::with('reservations');
+
+        if ($search = $request->query('search')) {
+            $query->where(function ($query) use ($search) {
+                $query->where('price', 'like', "%{$search}%")
+                    ->orWhere('unit_per_minute', 'like', "%{$search}%");
+            });
+        }
+
+        $orderBy = $request->query('order_by', 'created_at');
+        $orderDirection = $request->query('order_direction', 'desc');
+        $query->orderBy($orderBy, $orderDirection);
+
+        $perPage = $request->query('per_page', 10);
+        $services = $query->paginate($perPage);
+
+        return response()->json($services);
+    }
+
+    //------------- CHECK POST AVAILABILITY -----------\\
+    public function check_post_availability(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'view', Post::class);
+
+        $request->validate([
+            'post_id' => 'required|exists:posts,id',
+            'started_at' => 'required|date',
+            'ended_at' => 'required|date|after:started_at',
+        ]);
+
+        $post = Post::findOrFail($request->post_id);
+        
+        // Check if there's any active reservation for this post in the given time range
+        $conflictingReservation = Reservation::where('post_id', $request->post_id)
+            ->where('deleted_at', null)
+            ->where(function($query) use ($request) {
+                $query->whereBetween('started_at', [$request->started_at, $request->ended_at])
+                    ->orWhereBetween('ended_at', [$request->started_at, $request->ended_at])
+                    ->orWhere(function($q) use ($request) {
+                        $q->where('started_at', '<=', $request->started_at)
+                          ->where('ended_at', '>=', $request->ended_at);
+                    });
+            })
+            ->first();
+
+        return response()->json([
+            'post' => $post,
+            'is_available' => !$conflictingReservation,
+            'conflicting_reservation' => $conflictingReservation
+        ]);
+    }
+
+    //------------- CREATE ROOM RESERVATION -----------\\
+    public function create_room_reservation(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'create', Reservation::class);
+
+        $request->validate([
+            'post_id' => 'required|exists:posts,id',
+            'service_id' => 'required|exists:services,id',
+            'client_id' => 'required|exists:clients,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'started_at' => 'required|date',
+            'ended_at' => 'required|date|after:started_at',
+            'notes' => 'nullable|string',
+        ]);
+
+        \DB::transaction(function () use ($request) {
+            // Check availability first
+            $conflictingReservation = Reservation::where('post_id', $request->post_id)
+                ->where('deleted_at', null)
+                ->where(function($query) use ($request) {
+                    $query->whereBetween('started_at', [$request->started_at, $request->ended_at])
+                        ->orWhereBetween('ended_at', [$request->started_at, $request->ended_at])
+                        ->orWhere(function($q) use ($request) {
+                            $q->where('started_at', '<=', $request->started_at)
+                              ->where('ended_at', '>=', $request->ended_at);
+                        });
+                })
+                ->first();
+
+            if ($conflictingReservation) {
+                throw new \Exception('This room is not available for the selected time period.');
+            }
+
+            // Calculate duration in minutes
+            $startedAt = Carbon::parse($request->started_at);
+            $endedAt = Carbon::parse($request->ended_at);
+            $durationMinutes = $endedAt->diffInMinutes($startedAt);
+
+            // Get service details
+            $service = Service::findOrFail($request->service_id);
+            $totalPrice = ($service->price * $service->unit_per_minute * $durationMinutes) / 60; // Convert to hours
+
+            // Create reservation
+            $reservation = new Reservation();
+            $reservation->ref = $this->getNumberOrder();
+            $reservation->post_id = $request->post_id;
+            $reservation->service_id = $request->service_id;
+            $reservation->client_id = $request->client_id;
+            $reservation->warehouse_id = $request->warehouse_id;
+            $reservation->started_at = $request->started_at;
+            $reservation->ended_at = $request->ended_at;
+            $reservation->total_price = $totalPrice;
+            $reservation->paid_amount = 0;
+            $reservation->payment_status = 'unpaid';
+            $reservation->status = 'pending';
+            $reservation->notes = $request->notes;
+            $reservation->user_id = Auth::user()->id;
+            $reservation->date = Carbon::now();
+            $reservation->save();
+
+        }, 10);
+
+        return response()->json(['success' => true, 'message' => 'Room reservation created successfully']);
+    }
+
+    //------------- CREATE DRAFT ROOM RESERVATION -----------\\
+    public function create_draft_room_reservation(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'create', Reservation::class);
+
+        $request->validate([
+            'post_id' => 'required|exists:posts,id',
+            'service_id' => 'required|exists:services,id',
+            'client_id' => 'required|exists:clients,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'started_at' => 'required|date',
+            'ended_at' => 'required|date|after:started_at',
+            'notes' => 'nullable|string',
+        ]);
+
+        \DB::transaction(function () use ($request) {
+            // Calculate duration in minutes
+            $startedAt = Carbon::parse($request->started_at);
+            $endedAt = Carbon::parse($request->ended_at);
+            $durationMinutes = $endedAt->diffInMinutes($startedAt);
+
+            // Get service details
+            $service = Service::findOrFail($request->service_id);
+            $totalPrice = ($service->price * $service->unit_per_minute * $durationMinutes) / 60; // Convert to hours
+
+            // Create draft reservation
+            $reservation = new Reservation();
+            $reservation->ref = $this->getNumberOrder();
+            $reservation->post_id = $request->post_id;
+            $reservation->service_id = $request->service_id;
+            $reservation->client_id = $request->client_id;
+            $reservation->warehouse_id = $request->warehouse_id;
+            $reservation->started_at = $request->started_at;
+            $reservation->ended_at = $request->ended_at;
+            $reservation->total_price = $totalPrice;
+            $reservation->paid_amount = 0;
+            $reservation->payment_status = 'unpaid';
+            $reservation->status = 'draft';
+            $reservation->notes = $request->notes;
+            $reservation->user_id = Auth::user()->id;
+            $reservation->date = Carbon::now();
+            $reservation->save();
+
+        }, 10);
+
+        return response()->json(['success' => true, 'message' => 'Draft room reservation created successfully']);
     }
     
 }

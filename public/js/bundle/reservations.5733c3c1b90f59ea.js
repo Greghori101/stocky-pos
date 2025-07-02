@@ -188,7 +188,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     FlagIcon: vue_flag_icon__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   metaInfo: {
-    title: "POS"
+    title: "Reservations"
   },
   data: function data() {
     return {
@@ -294,7 +294,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         shipping: 0,
         discount: 0,
         TaxNet: 0,
-        notes: ''
+        notes: '',
+        post_id: "",
+        service_id: ""
       },
       client: {
         id: "",
@@ -338,7 +340,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         imei_number: ""
       },
       sound: "/audio/Beep.wav",
-      audio: new Audio("/audio/Beep.wav")
+      audio: new Audio("/audio/Beep.wav"),
+      posts: [],
+      services: []
     };
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["currentUser", "currentUserPermissions"])), {}, {
@@ -430,6 +434,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
   mounted: function mounted() {
     this.changeSidebarProperties();
     this.paginate_products(this.product_perPage, 0);
+    this.fetchPosts();
+    this.fetchServices();
   },
   methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapActions)(["changeSidebarProperties", "changeThemeMode", "logout"])), {}, (_objectSpread2 = {
     // ...mapGetters(["currentUser"]),
@@ -638,7 +644,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       shipping: this.sale.shipping ? this.sale.shipping : 0,
       notes: this.sale.notes,
       details: this.details,
-      GrandTotal: this.GrandTotal
+      GrandTotal: this.GrandTotal,
+      post_id: this.sale.post_id,
+      service_id: this.sale.service_id
     }).then(function (response) {
       if (response.data.success === true) {
         // Complete the animation of theprogress bar.
@@ -773,7 +781,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       tax_number: this.client.tax_number,
       country: this.client.country,
       city: this.client.city,
-      adresse: this.client.adresse
+      adresse: this.client.adresse,
+      post_id: this.sale.post_id,
+      service_id: this.sale.service_id
     }).then(function (response) {
       nprogress__WEBPACK_IMPORTED_MODULE_0___default().done();
       _this16.makeToast("success", _this16.$t("Create.TitleCustomer"), _this16.$t("Success"));
@@ -1048,7 +1058,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                 token: token.id,
                 is_new_credit_card: _this25.is_new_credit_card,
                 selectedCard: _this25.selectedCard,
-                card_id: _this25.card_id
+                card_id: _this25.card_id,
+                post_id: _this25.sale.post_id,
+                service_id: _this25.sale.service_id
               }).then(function (response) {
                 _this25.paymentProcessing = false;
                 if (response.data.success === true) {
@@ -1100,7 +1112,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
         is_new_credit_card: this.is_new_credit_card,
         selectedCard: this.selectedCard,
-        card_id: this.card_id
+        card_id: this.card_id,
+        post_id: this.sale.post_id,
+        service_id: this.sale.service_id
       }).then(function (response) {
         if (response.data.success === true) {
           // Complete the animation of theprogress bar.
@@ -1372,7 +1386,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     } else {
       this.makeToast("warning", this.$t("Please_wait_until_the_product_is_loaded"), this.$t("Warning"));
     }
-  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_objectSpread2, "Products_by_Category", function Products_by_Category(id) {
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_objectSpread2, "Products_by_Category", function Products_by_Category(id) {
     this.category_id = id;
     this.getProducts(1);
   }), "Products_by_Brands", function Products_by_Brands(id) {
@@ -1425,23 +1439,33 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     })["catch"](function (response) {
       _this31.isLoading = false;
     });
+  }), "fetchPosts", function fetchPosts() {
+    var _this32 = this;
+    axios.get('posts').then(function (res) {
+      _this32.posts = res.data.data || res.data;
+    });
+  }), "fetchServices", function fetchServices() {
+    var _this33 = this;
+    axios.get('services').then(function (res) {
+      _this33.services = res.data.data || res.data;
+    });
   }))),
   //-------------------- Created Function -----\\
   created: function created() {
-    var _this32 = this;
+    var _this34 = this;
     this.GetElementsPos();
     Fire.$on("pay_now", function () {
       setTimeout(function () {
-        _this32.payment.amount = _this32.formatNumber(_this32.GrandTotal, 2);
-        _this32.payment.received_amount = _this32.formatNumber(_this32.GrandTotal, 2);
-        _this32.payment.Reglement = "Cash";
-        _this32.$bvModal.show("Add_Payment");
+        _this34.payment.amount = _this34.formatNumber(_this34.GrandTotal, 2);
+        _this34.payment.received_amount = _this34.formatNumber(_this34.GrandTotal, 2);
+        _this34.payment.Reglement = "Cash";
+        _this34.$bvModal.show("Add_Payment");
         // Complete the animation of theprogress bar.
         nprogress__WEBPACK_IMPORTED_MODULE_0___default().done();
       }, 500);
     });
     Fire.$on("event_delete_draft_sale", function () {
-      _this32.get_Draft_Sales(_this32.serverParams.page);
+      _this34.get_Draft_Sales(_this34.serverParams.page);
       // Complete the animation of theprogress bar.
       setTimeout(function () {
         return nprogress__WEBPACK_IMPORTED_MODULE_0___default().done();
@@ -1991,6 +2015,68 @@ var render = function render() {
       }
     }], null, false, 1940612659)
   })], 1), _vm._v(" "), _c("b-col", {
+    attrs: {
+      lg: "12",
+      md: "12",
+      sm: "12"
+    }
+  }, [_c("b-form-group", {
+    attrs: {
+      label: "Select Room (Post)"
+    }
+  }, [_c("v-select", {
+    attrs: {
+      options: _vm.posts.map(function (post) {
+        return {
+          label: post.name,
+          value: post.id
+        };
+      }),
+      reduce: function reduce(label) {
+        return label.value;
+      },
+      placeholder: "Select a room",
+      clearable: true
+    },
+    model: {
+      value: _vm.sale.post_id,
+      callback: function callback($$v) {
+        _vm.$set(_vm.sale, "post_id", $$v);
+      },
+      expression: "sale.post_id"
+    }
+  })], 1)], 1), _vm._v(" "), _c("b-col", {
+    attrs: {
+      lg: "12",
+      md: "12",
+      sm: "12"
+    }
+  }, [_c("b-form-group", {
+    attrs: {
+      label: "Select Service"
+    }
+  }, [_c("v-select", {
+    attrs: {
+      options: _vm.services.map(function (service) {
+        return {
+          label: service.name || "Service #" + service.id,
+          value: service.id
+        };
+      }),
+      reduce: function reduce(label) {
+        return label.value;
+      },
+      placeholder: "Select a service",
+      clearable: true
+    },
+    model: {
+      value: _vm.sale.service_id,
+      callback: function callback($$v) {
+        _vm.$set(_vm.sale, "service_id", $$v);
+      },
+      expression: "sale.service_id"
+    }
+  })], 1)], 1), _vm._v(" "), _c("b-col", {
     staticClass: "mt-2",
     attrs: {
       md: "12"
