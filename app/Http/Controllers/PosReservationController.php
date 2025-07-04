@@ -17,9 +17,9 @@ use App\Models\PaymentWithCreditCard;
 use App\Models\Role;
 use App\Models\Unit;
 use App\Models\Reservation;
-use App\Models\ReservationDetail;
+use App\Models\ReservationItem;
 use App\Models\DraftReservation;
-use App\Models\DraftReservationDetail;
+use App\Models\DraftReservationItem;
 use App\Models\Warehouse;
 use App\utils\helpers;
 use Carbon\Carbon;
@@ -35,7 +35,7 @@ class PosReservationController extends BaseController
 
     public function CreatePOS(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        // $this->authorizeForUser($request->user('api'), 'reservations_add', Reservation::class);
 
         request()->validate([
             'client_id' => 'required',
@@ -49,43 +49,40 @@ class PosReservationController extends BaseController
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $order = new Reservation;
 
-            $order->is_pos = 1;
             $order->date = Carbon::now();
-            $order->Ref = app('App\Http\Controllers\ReservationsController')->getNumberOrder();
+            $order->ref = app('App\\Http\\Controllers\\ReservationsController')->getNumberOrder();
             $order->client_id = $request->client_id;
             $order->warehouse_id = $request->warehouse_id;
             $order->tax_rate = $request->tax_rate;
-            $order->TaxNet = $request->TaxNet;
+            $order->tax_net = $request->tax_net ?? 0;
             $order->discount = $request->discount;
-            $order->shipping = $request->shipping;
-            $order->GrandTotal = $request->GrandTotal;
+            $order->total_price = $request->total_price ?? 0;
             $order->notes = $request->notes;
-            $order->statut = 'completed';
-            $order->payment_statut = 'unpaid';
+            $order->status = 'completed';
+            $order->payment_status = 'unpaid';
             $order->user_id = Auth::user()->id;
+            $order->service_id = $request->service_id ?? null;
+            $order->post_id = $request->post_id ?? null;
 
             $order->save();
 
             $data = $request['details'];
             foreach ($data as $key => $value) {
-
-                $unit = Unit::where('id', $value['reservation_unit_id'])
-                    ->first();
                 $orderDetails[] = [
-                    'date' => Carbon::now(),
                     'reservation_id' => $order->id,
-                    'reservation_unit_id' =>  $value['reservation_unit_id'],
-                    'quantity' => $value['quantity'],
                     'product_id' => $value['product_id'],
-                    'product_variant_id' => $value['product_variant_id'],
-                    'total' => $value['subtotal'],
                     'price' => $value['Unit_price'],
-                    'TaxNet' => $value['tax_percent'],
+                    'qte' => $value['quantity'],
+                    'unit_id' => $value['reservation_unit_id'],
+                    'total' => $value['subtotal'],
+                    'tax_net' => $value['tax_percent'],
                     'tax_method' => $value['tax_method'],
                     'discount' => $value['discount'],
                     'discount_method' => $value['discount_Method'],
-                    'imei_number' => $value['imei_number'],
                 ];
+
+                $unit = Unit::where('id', $value['reservation_unit_id'])
+                    ->first();
 
                 if ($value['product_variant_id'] !== null) {
                     $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
@@ -116,7 +113,7 @@ class PosReservationController extends BaseController
                 }
             }
 
-            ReservationDetail::insert($orderDetails);
+            ReservationItem::insert($orderDetails);
 
             $reservation = Reservation::findOrFail($order->id);
             // Check If User Has Permission view All Records
@@ -128,13 +125,13 @@ class PosReservationController extends BaseController
             try {
 
                 $total_paid = $reservation->paid_amount + $request['amount'];
-                $due = $reservation->GrandTotal - $total_paid;
+                $due = $reservation->total_price - $total_paid;
 
                 if ($due === 0.0 || $due < 0.0) {
                     $payment_statut = 'paid';
-                } else if ($due != $reservation->GrandTotal) {
+                } else if ($due != $reservation->total_price) {
                     $payment_statut = 'partial';
-                } else if ($due == $reservation->GrandTotal) {
+                } else if ($due == $reservation->total_price) {
                     $payment_statut = 'unpaid';
                 }
                               
@@ -226,7 +223,7 @@ class PosReservationController extends BaseController
 
                         $reservation->update([
                             'paid_amount'    => $total_paid,
-                            'payment_statut' => $payment_statut,
+                            'payment_status' => $payment_statut,
                         ]);
 
                         $PaymentCard['customer_id'] = $request->client_id;
@@ -261,7 +258,7 @@ class PosReservationController extends BaseController
 
                         $reservation->update([
                             'paid_amount' => $total_paid,
-                            'payment_statut' => $payment_statut,
+                            'payment_status' => $payment_statut,
                         ]);
                     }
 
@@ -283,7 +280,7 @@ class PosReservationController extends BaseController
 
     public function get_draft_reservations(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // How many items do you want to display.
@@ -343,7 +340,7 @@ class PosReservationController extends BaseController
 
     public function CreateDraft(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
 
         request()->validate([
             'client_id' => 'required',
@@ -390,7 +387,7 @@ class PosReservationController extends BaseController
                 ];
             }
 
-            DraftReservationDetail::insert($orderDetails);
+            DraftReservationItem::insert($orderDetails);
 
         }, 10);
 
@@ -401,7 +398,7 @@ class PosReservationController extends BaseController
 
      public function remove_draft_reservation(Request $request, $id)
      {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
  
          \DB::transaction(function () use ($id, $request) {
  
@@ -428,7 +425,7 @@ class PosReservationController extends BaseController
 
     public function submit_reservation_from_draft(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
 
         request()->validate([
             'client_id' => 'required',
@@ -445,20 +442,20 @@ class PosReservationController extends BaseController
                 $view_records = Role::findOrFail($role->id)->inRole('record_view');
                 $order = new Reservation;
 
-                $order->is_pos = 1;
                 $order->date = Carbon::now();
-                $order->Ref = app('App\Http\Controllers\ReservationsController')->getNumberOrder();
+                $order->ref = app('App\\Http\\Controllers\\ReservationsController')->getNumberOrder();
                 $order->client_id = $request->client_id;
                 $order->warehouse_id = $request->warehouse_id;
                 $order->tax_rate = $request->tax_rate;
-                $order->TaxNet = $request->TaxNet;
+                $order->tax_net = $request->tax_net ?? 0;
                 $order->discount = $request->discount;
-                $order->shipping = $request->shipping;
-                $order->GrandTotal = $request->GrandTotal;
+                $order->total_price = $request->total_price ?? 0;
                 $order->notes = $request->notes;
-                $order->statut = 'completed';
-                $order->payment_statut = 'unpaid';
+                $order->status = 'completed';
+                $order->payment_status = 'unpaid';
                 $order->user_id = Auth::user()->id;
+                $order->service_id = $request->service_id ?? null;
+                $order->post_id = $request->post_id ?? null;
 
                 $order->save();
 
@@ -468,19 +465,16 @@ class PosReservationController extends BaseController
                     $unit = Unit::where('id', $value['reservation_unit_id'])
                         ->first();
                     $orderDetails[] = [
-                        'date' => Carbon::now(),
                         'reservation_id' => $order->id,
-                        'reservation_unit_id' =>  $value['reservation_unit_id'],
-                        'quantity' => $value['quantity'],
                         'product_id' => $value['product_id'],
-                        'product_variant_id' => $value['product_variant_id'],
-                        'total' => $value['subtotal'],
                         'price' => $value['Unit_price'],
-                        'TaxNet' => $value['tax_percent'],
+                        'qte' => $value['quantity'],
+                        'unit_id' => $value['reservation_unit_id'],
+                        'total' => $value['subtotal'],
+                        'tax_net' => $value['tax_percent'],
                         'tax_method' => $value['tax_method'],
                         'discount' => $value['discount'],
                         'discount_method' => $value['discount_Method'],
-                        'imei_number' => $value['imei_number'],
                     ];
 
                     if ($value['product_variant_id'] !== null) {
@@ -512,7 +506,7 @@ class PosReservationController extends BaseController
                     }
                 }
 
-                ReservationDetail::insert($orderDetails);
+                ReservationItem::insert($orderDetails);
 
                 $reservation = Reservation::findOrFail($order->id);
                 // Check If User Has Permission view All Records
@@ -524,13 +518,13 @@ class PosReservationController extends BaseController
                 try {
 
                     $total_paid = $reservation->paid_amount + $request['amount'];
-                    $due = $reservation->GrandTotal - $total_paid;
+                    $due = $reservation->total_price - $total_paid;
 
                     if ($due === 0.0 || $due < 0.0) {
                         $payment_statut = 'paid';
-                    } else if ($due != $reservation->GrandTotal) {
+                    } else if ($due != $reservation->total_price) {
                         $payment_statut = 'partial';
-                    } else if ($due == $reservation->GrandTotal) {
+                    } else if ($due == $reservation->total_price) {
                         $payment_statut = 'unpaid';
                     }
                                 
@@ -622,7 +616,7 @@ class PosReservationController extends BaseController
 
                             $reservation->update([
                                 'paid_amount'    => $total_paid,
-                                'payment_statut' => $payment_statut,
+                                'payment_status' => $payment_statut,
                             ]);
 
                             $PaymentCard['customer_id'] = $request->client_id;
@@ -657,7 +651,7 @@ class PosReservationController extends BaseController
 
                             $reservation->update([
                                 'paid_amount' => $total_paid,
-                                'payment_statut' => $payment_statut,
+                                'payment_status' => $payment_statut,
                             ]);
                         }
 
@@ -687,7 +681,7 @@ class PosReservationController extends BaseController
 
     public function data_draft_convert_reservation(Request $request, $id)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
         $settings = Setting::where('deleted_at', '=', null)->with('Client')->first();
         $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
@@ -868,7 +862,7 @@ class PosReservationController extends BaseController
 
     public function GetProductsByParametre(request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
 
         // How many items do you want to display.
         $perPage = PosSetting::where('deleted_at', '=', null)->first()->products_per_page;
@@ -1011,7 +1005,7 @@ class PosReservationController extends BaseController
 
     public function GetELementPos(Request $request)
     {
-        $this->authorizeForUser($request->user('api'), 'Reservations_pos', Reservation::class);
+        $this->authorizeForUser($request->user('api'), 'reservations', Reservation::class);
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
         $settings = Setting::where('deleted_at', '=', null)->with('Client')->first();
         $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
@@ -1099,5 +1093,34 @@ class PosReservationController extends BaseController
           }
           return $code;
       }
+
+    //------------- UPDATE RESERVATION -----------\\
+    public function update(Request $request, $id)
+    {
+        $this->authorizeForUser($request->user('api'), 'update', Reservation::class);
+        request()->validate([
+            'client_id' => 'required',
+            'warehouse_id' => 'required',
+            'service_id' => 'required',
+            'post_id' => 'required',
+        ]);
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update([
+            'client_id' => $request->client_id,
+            'warehouse_id' => $request->warehouse_id,
+            'tax_rate' => $request->tax_rate,
+            'tax_net' => $request->tax_net ?? 0,
+            'discount' => $request->discount,
+            'total_price' => $request->total_price ?? 0,
+            'notes' => $request->notes,
+            'status' => $request->status,
+            'payment_status' => $request->payment_status,
+            'user_id' => Auth::user()->id,
+            'service_id' => $request->service_id,
+            'post_id' => $request->post_id,
+        ]);
+        // Optionally update details, payment, etc. here
+        return response()->json(['success' => true, 'reservation' => $reservation]);
+    }
 
 }

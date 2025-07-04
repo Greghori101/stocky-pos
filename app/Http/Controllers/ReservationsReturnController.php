@@ -11,7 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\product_warehouse;
 use App\Models\Role;
 use App\Models\Reservation;
-use App\Models\ReservationDetail;
+use App\Models\ReservationItem;
 use App\Models\ReservationReturn;
 use App\Models\ReservationItemReturn;
 use App\Models\Setting;
@@ -1131,7 +1131,7 @@ class ReservationsReturnController extends BaseController
             $data['id'] = $detail->id;
             $data['detail_id'] = $detail_id += 1;
 
-            $sell_detail = ReservationDetail::where('reservation_id', $reservation_id)
+            $sell_detail = ReservationItem::where('reservation_id', $reservation_id)
             ->where('product_id', $detail->product_id)
             ->where('product_variant_id', $detail->product_variant_id)
             ->first();

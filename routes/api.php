@@ -569,6 +569,8 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
         Route::put('{post}', 'PostController@update'); // Update a post
         Route::delete('{post}', 'PostController@destroy'); // Delete a post
     });
+
+    
 });
 
 //-------------------------------  Print & PDF ------------------------\\

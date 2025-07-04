@@ -27,7 +27,7 @@ mix.webpackConfig({
   plugins: [
     new MomentLocalesPlugin(),
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['./js/*'],
+      cleanOnceBeforeBuildPatterns: ['public/js/*'],
     }),
   ],
 })
